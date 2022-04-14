@@ -1,0 +1,41 @@
+policies:
+- name: taggable
+  resource: kms-key
+  filters:
+  - "tag:Name": present
+  actions:
+  - type: webhook
+    url: https://nttdatagroup.webhook.office.com/webhookb2/f9536fc4-7383-471f-9d07-f6fd2fd9ae3b@65e4e06f-f263-4c1f-becb-90deb8c2d9ff/IncomingWebhook/689eefabcc324c5aa94b6485ec840f87/85f994c1-3f46-4b91-aeca-9f6fe414e397
+    batch: true
+    method: POST
+    body: >
+      {
+
+        "@context": 'https://schema.org/extensions',
+        "@type": 'MessageCard',
+        "themeColor": '0072C6',
+        "summary": 'Cloud Custodian Notification',
+        "sections": [
+          {
+            "activityImage": 'https://urlp.sfbassets.com/urlpcdn/eus1/contentapi1/b429f262-c0b3-48fb-9649-4200e4c933ae',
+            "activityTitle": 'Cloud Custodian Notification',
+            "activityText": policy.name,
+            "text": 'The following KMS Keys have exceeded the defined  retention period and have been **deleted**.',
+            "facts": [
+             { "name": 'Account', "value": account_id },
+             { "name": 'Region', "value": region },
+             { "name": 'Resources', "value": join(`, `, resources[].StackName) }
+            ]
+          }
+         ],
+        "potentialAction": [
+          {
+            "@type": 'OpenUri',
+            "name": 'AWS Cloud Usage Policies',
+             "targets": [
+               { "os": 'default', "uri": 'https://github.com/NTT-DATA-Cloud-Transformation/flux7-wiki/wiki/AWS-Cloud-Usage-Policies#cloudformation-cleanup'
+          }
+              ]
+            }
+          ]
+        }
